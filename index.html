@@ -1,0 +1,1784 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Курс повышения квалификации: Цифровая педагогика — нейросети в образовательном процессе</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@4.5.15/index.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/montserrat@4.5.15/index.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Montserrat', sans-serif; }
+        
+        .gradient-hero { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #8b5cf6 100%); }
+        .gradient-section { background: linear-gradient(180deg, #f0f9ff 0%, #f8fafc 100%); }
+        .gradient-purple { background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%); }
+        .gradient-blue { background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); }
+        .gradient-green { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+        
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
+        
+        .animate-fade-in { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .animate-fade-in.visible { opacity: 1; transform: translateY(0); }
+        
+        .timeline-line { position: relative; }
+        .timeline-line::before {
+            content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 3px;
+            background: linear-gradient(to bottom, #3b82f6, #8b5cf6, #ec4899);
+            transform: translateX(-50%);
+        }
+        @media (max-width: 768px) { .timeline-line::before { left: 20px; } }
+        
+        .timeline-item { position: relative; }
+        .timeline-dot {
+            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: white; position: absolute; left: 50%; transform: translateX(-50%); z-index: 10;
+            box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+        }
+        @media (max-width: 768px) { .timeline-dot { left: 20px; } }
+        
+        .prompt-card { border-left: 4px solid #6366f1; background: linear-gradient(135deg, #f8fafc, #f1f5f9); }
+        .response-card { border-left: 4px solid #10b981; background: linear-gradient(135deg, #f0fdf4, #dcfce7); }
+        .warning-card { border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #fffbeb, #fef3c7); }
+        .info-card { border-left: 4px solid #3b82f6; background: linear-gradient(135deg, #f0f9ff, #e0f2fe); }
+        
+        .tab-btn { transition: all 0.2s; }
+        .tab-btn.active { background: #4f46e5; color: white; box-shadow: 0 4px 12px rgba(79,70,229,0.4); }
+        .tab-btn:not(.active) { background: #e5e7eb; color: #374151; }
+        .tab-btn:not(.active):hover { background: #d1d5db; }
+        
+        .test-option { cursor: pointer; transition: all 0.2s; }
+        .test-option:hover:not(.disabled) { border-color: #4f46e5; background: #f5f3ff; }
+        .test-option.correct { border-color: #10b981; background: #d1fae5; }
+        .test-option.incorrect { border-color: #ef4444; background: #fee2e2; }
+        .test-option.disabled { cursor: not-allowed; opacity: 0.8; }
+        
+        .float-anim { animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .pulse-anim { animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        
+        .neural-node {
+            position: absolute; width: 14px; height: 14px; border-radius: 50%; background: #4f46e5;
+            animation: nodePulse 3s ease-in-out infinite;
+        }
+        @keyframes nodePulse { 0%,100% { opacity: 0.6; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+        
+        .progress-bar { height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #4f46e5, #7c3aed); transition: width 0.5s ease; border-radius: 3px; }
+        
+        .section-divider { height: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899); border-radius: 2px; }
+        
+        .sticky-nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); }
+        
+        .module-content { max-height: 0; overflow: hidden; transition: max-height 0.6s ease; }
+        .module-content.open { max-height: 20000px; }
+        
+        .scroll-top-btn { position: fixed; bottom: 30px; right: 30px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        .scroll-top-btn.visible { opacity: 1; pointer-events: all; }
+        
+        @media (max-width: 768px) {
+            .timeline-item > div:not(.timeline-dot) { margin-left: 60px !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Scroll to top button -->
+    <button id="scrollTop" class="scroll-top-btn bg-indigo-600 text-white p-3 rounded-full shadow-lg hover:bg-indigo-700 transition">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+
+    <!-- Navigation -->
+    <nav class="sticky-nav shadow-md border-b border-gray-200">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <span class="text-lg font-bold text-gray-800 hidden sm:block">ППК: Цифровая педагогика</span>
+            </div>
+            <div class="hidden lg:flex items-center space-x-6 text-sm">
+                <a href="#welcome" class="text-gray-600 hover:text-indigo-600 transition">Вступление</a>
+                <a href="#module1" class="text-gray-600 hover:text-indigo-600 transition">Модуль 1</a>
+                <a href="#module2" class="text-gray-600 hover:text-indigo-600 transition">Модуль 2</a>
+                <a href="#module3" class="text-gray-600 hover:text-indigo-600 transition">Модуль 3</a>
+                <a href="#conclusion" class="text-gray-600 hover:text-indigo-600 transition">Завершение</a>
+                <span class="bg-indigo-600 text-white px-3 py-1 rounded-full text-xs">8 часов</span>
+            </div>
+            <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg hover:bg-gray-100">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden lg:hidden bg-white border-t border-gray-200 px-4 py-4 space-y-3">
+            <a href="#welcome" class="block text-gray-600 hover:text-indigo-600">Вступление</a>
+            <a href="#module1" class="block text-gray-600 hover:text-indigo-600">Модуль 1</a>
+            <a href="#module2" class="block text-gray-600 hover:text-indigo-600">Модуль 2</a>
+            <a href="#module3" class="block text-gray-600 hover:text-indigo-600">Модуль 3</a>
+            <a href="#conclusion" class="block text-gray-600 hover:text-indigo-600">Завершение</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="gradient-hero text-white py-20 md:py-32 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg viewBox="0 0 800 400" class="w-full h-full"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="0.5"/></pattern></defs><rect width="800" height="400" fill="url(#grid)"/></svg>
+        </div>
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <div class="animate-fade-in">
+                <span class="inline-block bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full text-sm font-semibold mb-6">🎓 Курс повышения квалификации</span>
+                <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight max-w-5xl mx-auto">
+                    Цифровая педагогика:<br>нейросети в образовательном процессе
+                </h1>
+                <p class="text-lg md:text-xl mb-10 opacity-90 max-w-3xl mx-auto">
+                    Освойте современные инструменты искусственного интеллекта для повышения эффективности преподавания и адаптации к новым реалиям образования
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-10">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5">
+                        <div class="text-3xl font-bold mb-1">8</div>
+                        <div class="text-sm opacity-80">академических часов</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5">
+                        <div class="text-3xl font-bold mb-1">3</div>
+                        <div class="text-sm opacity-80">модуля</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5">
+                        <div class="text-3xl font-bold mb-1">4</div>
+                        <div class="text-sm opacity-80">темы в Модуле 1</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5">
+                        <div class="text-3xl font-bold mb-1">∞</div>
+                        <div class="text-sm opacity-80">дистанционный формат</div>
+                    </div>
+                </div>
+                <a href="#module1" class="inline-block bg-white text-indigo-700 px-8 py-4 rounded-xl text-lg font-bold hover:bg-gray-100 transition transform hover:scale-105 shadow-xl">
+                    Начать обучение →
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Welcome Section -->
+    <section id="welcome" class="py-20 gradient-section">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto animate-fade-in">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Вводная часть. Приветствие</h2>
+                    <div class="section-divider mx-auto w-20 mb-6"></div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-indigo-50 to-purple-50 p-8">
+                        <div class="flex flex-col md:flex-row items-center gap-6">
+                            <div class="w-32 h-32 bg-gradient-to-br from-indigo-200 to-purple-200 rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg class="w-16 h-16 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <div class="text-center md:text-left">
+                                <h3 class="text-2xl font-bold text-gray-800 mb-2">Казакова Елена Ивановна</h3>
+                                <p class="text-indigo-600 font-semibold mb-2">Директор Института педагогики, доктор педагогических наук</p>
+                                <p class="text-gray-600 text-sm">Видеообращение к участникам курса</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <div class="aspect-video bg-gray-200 rounded-xl flex items-center justify-center mb-6 cursor-pointer hover:bg-gray-300 transition group" id="videoPlaceholder">
+                            <div class="text-center">
+                                <div class="w-20 h-20 bg-white/80 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition shadow-lg">
+                                    <svg class="w-10 h-10 text-indigo-600 ml-1" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                </div>
+                                <p class="text-gray-600 font-medium">Видеообращение</p>
+                            </div>
+                        </div>
+                        <div class="info-card p-5 rounded-xl">
+                            <p class="text-gray-700">Добро пожаловать на курс повышения квалификации <strong>«Цифровая педагогика: нейросети в образовательном процессе»</strong>. В рамках данного курса вы познакомитесь с основами работы нейросетей, научитесь применять их в своей профессиональной деятельности и узнаете, как организовать образовательный процесс в условиях повсеместного использования ИИ учениками.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODULE 1 -->
+    <section id="module1" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12 animate-fade-in">
+                <div class="inline-block bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-sm font-semibold mb-4">Модуль 1 — 4 академических часа</div>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Нейросети в педагогической практике</h2>
+                <div class="section-divider mx-auto w-20"></div>
+            </div>
+
+            <!-- Topic 1.1 -->
+            <div id="topic1-1" class="mb-16 animate-fade-in">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold text-xl shadow-lg">1.1</div>
+                    <div>
+                        <h3 class="text-2xl md:text-3xl font-bold">Что такое нейросети и как они работают</h3>
+                        <p class="text-gray-600">Краткая история и основные понятия</p>
+                    </div>
+                </div>
+
+                <!-- AI Definition -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <div class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl p-8 border border-indigo-100">
+                        <h4 class="text-xl font-bold text-indigo-700 mb-4 flex items-center">
+                            <svg class="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            Искусственный интеллект (ИИ)
+                        </h4>
+                        <p class="text-gray-700 leading-relaxed mb-4">
+                            <strong>Искусственный интеллект (ИИ)</strong> — это область компьютерных наук, занимающаяся созданием интеллектуальных систем, способных имитировать когнитивные функции человека, такие как обучение, логическое мышление, распознавание образов и принятие решений. ИИ позволяет машинам эффективно решать задачи, обрабатывать данные и обучаться на собственном опыте.
+                        </p>
+                        <p class="text-gray-700 leading-relaxed mb-6">
+                            По сути, <strong>ИИ</strong> — это программы, которые умеют делать то, что раньше считалось «человеческим»: думать (вернее имитировать этот процесс), анализировать, отвечать на вопросы, создавать картинки или музыку.
+                        </p>
+                        <div class="bg-white rounded-xl p-5 border-l-4 border-indigo-500">
+                            <h5 class="font-bold text-indigo-700 mb-2">Нейронная сеть</h5>
+                            <p class="text-gray-700 text-sm">Математическая модель, архитектура которой вдохновлена принципами работы биологического мозга. Состоит из множества связанных между собой «нейронов» — вычислительных узлов, организованных в слои. Каждый нейрон получает входные данные, обрабатывает их и передаёт результат дальше.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- How Neural Networks Work -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <h4 class="text-xl font-bold mb-6 text-center">Ключевой принцип работы нейросети</h4>
+                    <div class="bg-gray-50 rounded-2xl p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div class="bg-white rounded-xl p-6 text-center shadow-sm card-hover">
+                                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                </div>
+                                <h5 class="font-bold text-lg mb-2">1. Токенизация</h5>
+                                <p class="text-gray-600 text-sm">Ваш текст разбивается на фрагменты (токены): слова или части слов</p>
+                            </div>
+                            <div class="bg-white rounded-xl p-6 text-center shadow-sm card-hover">
+                                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 pulse-anim">
+                                    <svg class="w-8 h-8 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m11-7h-6m-6 0H5"/></svg>
+                                </div>
+                                <h5 class="font-bold text-lg mb-2">2. Контекстуализация</h5>
+                                <p class="text-gray-600 text-sm">Модель анализирует все токены в контексте друг друга, определяя связи и значения</p>
+                            </div>
+                            <div class="bg-white rounded-xl p-6 text-center shadow-sm card-hover">
+                                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                </div>
+                                <h5 class="font-bold text-lg mb-2">3. Генерация</h5>
+                                <p class="text-gray-600 text-sm">Модель последовательно предсказывает наиболее вероятный следующий токен, создавая текст слово за словом</p>
+                            </div>
+                        </div>
+                        <div class="warning-card p-5 rounded-xl">
+                            <p class="text-gray-700 text-sm">
+                                <strong>Важно:</strong> Языковая модель не понимает текст в человеческом смысле. Она вычисляет статистическую вероятность следующего слова на основе паттернов, извлечённых из обучающих данных. Это означает, что нейросеть может уверенно генерировать фактически неверную информацию. Это явление называется <span class="font-semibold text-red-600">«галлюцинация»</span>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generative Networks -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border border-purple-100">
+                        <h4 class="text-xl font-bold text-purple-700 mb-4">Генеративные нейросети</h4>
+                        <p class="text-gray-700 leading-relaxed mb-4">
+                            <strong>Генеративные нейросети</strong> — это особый класс систем, которые способны создавать новый контент: текст, изображения, музыку, код. Именно они стали массово доступны в 2022–2026 годах и произвели революцию в представлениях о возможностях ИИ.
+                        </p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+                                <div class="text-3xl mb-2">📝</div>
+                                <p class="text-sm font-medium text-gray-700">Тексты</p>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+                                <div class="text-3xl mb-2">🎨</div>
+                                <p class="text-sm font-medium text-gray-700">Изображения</p>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+                                <div class="text-3xl mb-2">🎵</div>
+                                <p class="text-sm font-medium text-gray-700">Музыка</p>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+                                <div class="text-3xl mb-2">💻</div>
+                                <p class="text-sm font-medium text-gray-700">Код</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <h4 class="text-xl font-bold mb-8 text-center">Краткая хронология ИИ</h4>
+                    <div class="timeline-line relative py-4">
+                        <div class="timeline-item mb-12">
+                            <div class="timeline-dot bg-blue-500">50-е</div>
+                            <div class="md:grid md:grid-cols-2 md:gap-8">
+                                <div class="md:text-right"></div>
+                                <div class="bg-white rounded-xl p-6 shadow-sm card-hover ml-12 md:ml-0">
+                                    <h5 class="font-bold text-blue-600 mb-2">1950-е годы</h5>
+                                    <p class="text-gray-600 text-sm">Алан Тьюринг ставит вопрос «Может ли машина мыслить?» и предлагает знаменитый «тест Тьюринга». Появляются первые программы, способные играть в шахматы и доказывать теоремы.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-item mb-12">
+                            <div class="timeline-dot bg-indigo-500">60-90</div>
+                            <div class="md:grid md:grid-cols-2 md:gap-8">
+                                <div class="bg-white rounded-xl p-6 shadow-sm card-hover mr-12 md:mr-0 md:text-right">
+                                    <h5 class="font-bold text-indigo-600 mb-2">1960–1990-е годы</h5>
+                                    <p class="text-gray-600 text-sm">Исследования нейронных сетей переживают периоды подъёма и спада. Вычислительных мощностей и объёма данных недостаточно для практического применения.</p>
+                                </div>
+                                <div class="hidden md:block"></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item mb-12">
+                            <div class="timeline-dot bg-purple-500">10-е</div>
+                            <div class="md:grid md:grid-cols-2 md:gap-8">
+                                <div class="md:text-right"></div>
+                                <div class="bg-white rounded-xl p-6 shadow-sm card-hover ml-12 md:ml-0">
+                                    <h5 class="font-bold text-purple-600 mb-2">2010-е годы</h5>
+                                    <p class="text-gray-600 text-sm">Развитие технологии глубокого обучения (deep learning). Нейросети начинают превосходить человека в отдельных задачах: распознавание изображений, игра в го, перевод текстов. Внедрение нейросетей в профессиональные области деятельности.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-item mb-12">
+                            <div class="timeline-dot bg-pink-500">2017</div>
+                            <div class="md:grid md:grid-cols-2 md:gap-8">
+                                <div class="bg-white rounded-xl p-6 shadow-sm card-hover mr-12 md:mr-0 md:text-right">
+                                    <h5 class="font-bold text-pink-600 mb-2">2017 год</h5>
+                                    <p class="text-gray-600 text-sm">Компания Google представляет архитектуру Transformer, которая ляжет в основу всех современных языковых моделей.</p>
+                                </div>
+                                <div class="hidden md:block"></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot bg-green-500">Сегодня</div>
+                            <div class="md:grid md:grid-cols-2 md:gap-8">
+                                <div class="md:text-right"></div>
+                                <div class="bg-white rounded-xl p-6 shadow-sm card-hover ml-12 md:ml-0 ring-2 ring-green-200">
+                                    <h5 class="font-bold text-green-600 mb-2">2022–2026 годы</h5>
+                                    <p class="text-gray-600 text-sm">Генеративные нейросети становятся массово доступными. В России повсеместно внедряются собственные разработки: <strong>GigaChat</strong> от Сбера, <strong>YandexGPT</strong> от Яндекса. Миллионы людей начинают использовать ИИ в повседневной жизни, работе и учёбе.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Message for Teachers -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <div class="gradient-purple rounded-2xl p-8 text-white">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold mb-3">Для вас, как для педагога</h4>
+                                <p class="leading-relaxed opacity-95">
+                                    То, что мы наблюдаем сейчас, — это не кратковременная мода, которую можно пропустить, а результат десятилетий научных исследований, который будет только развиваться. То, насколько сильно внедрение нейросетей изменит (и уже изменило!) все сферы нашей деятельности, мы можем ещё до конца не осознавать.
+                                </p>
+                                <p class="leading-relaxed opacity-95 mt-4">
+                                    В ближайшие несколько лет мы ещё пройдём через стадию сильного разочарования в нейросетях как «волшебной палочки» и перейдём к понятному использованию их для решения конкретных задач. Поэтому от того, насколько быстро вы освоите эти технологии в своей практике, будет зависеть и то, насколько проще вам будет в будущем.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Types of Neural Networks Table -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <h4 class="text-xl font-bold mb-6 text-center">Основные типы нейросетей, с которыми сталкиваются педагоги</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full bg-white rounded-xl shadow-sm overflow-hidden">
+                            <thead class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+                                <tr>
+                                    <th class="text-left p-4 font-semibold">Тип</th>
+                                    <th class="text-left p-4 font-semibold">Что делает</th>
+                                    <th class="text-left p-4 font-semibold">Примеры</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr class="hover:bg-indigo-50 transition">
+                                    <td class="p-4 font-semibold text-indigo-700">Большие языковые модели (LLM)</td>
+                                    <td class="p-4 text-sm text-gray-600">Генерируют, анализируют и редактируют тексты, ведут диалог, отвечают на вопросы</td>
+                                    <td class="p-4 text-sm"><span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-xs">GigaChat</span> <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-xs">YandexGPT</span> <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-xs">DeepSeek</span> <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-xs">ChatGPT</span> <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-xs">Claude</span> <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-xs">Gemini</span></td>
+                                </tr>
+                                <tr class="hover:bg-purple-50 transition">
+                                    <td class="p-4 font-semibold text-purple-700">Генераторы изображений</td>
+                                    <td class="p-4 text-sm text-gray-600">Создают изображения по текстовому описанию</td>
+                                    <td class="p-4 text-sm"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs">Kandinsky</span> <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs">Midjourney</span> <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs">DALL-E</span> <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs">Stable Diffusion</span> <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs">Шедеврум</span></td>
+                                </tr>
+                                <tr class="hover:bg-pink-50 transition">
+                                    <td class="p-4 font-semibold text-pink-700">Генераторы видео и аудио</td>
+                                    <td class="p-4 text-sm text-gray-600">Создают видеоролики, озвучку, музыку</td>
+                                    <td class="p-4 text-sm"><span class="bg-pink-100 text-pink-700 px-2 py-1 rounded-full text-xs">Suno</span> <span class="bg-pink-100 text-pink-700 px-2 py-1 rounded-full text-xs">ElevenLabs</span> <span class="bg-pink-100 text-pink-700 px-2 py-1 rounded-full text-xs">Sora</span> <span class="bg-pink-100 text-pink-700 px-2 py-1 rounded-full text-xs">Kling</span></td>
+                                </tr>
+                                <tr class="hover:bg-green-50 transition">
+                                    <td class="p-4 font-semibold text-green-700">Специализированные образовательные ИИ</td>
+                                    <td class="p-4 text-sm text-gray-600">Помогают в составлении тестов, адаптации материалов, проверке работ</td>
+                                    <td class="p-4 text-sm text-gray-600">Различные образовательные платформы с интегрированным ИИ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Multimodal -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 border border-blue-100">
+                        <h4 class="text-xl font-bold text-blue-700 mb-4">Мультимодальные модели: текст, изображение, звук в одном инструменте</h4>
+                        <p class="text-gray-700 leading-relaxed mb-4">
+                            Современные нейросети всё чаще становятся <strong>мультимодальными</strong>, т.е. универсальными: они способны одновременно работать с текстом, изображениями, аудио и видео. Например, вы можете загрузить фотографию в GigaChat и попросить описать, что на ней изображено, или задать вопрос по содержанию графика. Со многими нейросетями можно даже общаться голосом.
+                        </p>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium flex items-center">📝 Текст</span>
+                            <span class="bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium flex items-center">🖼️ Изображения</span>
+                            <span class="bg-pink-100 text-pink-700 px-4 py-2 rounded-full text-sm font-medium flex items-center">🔊 Аудио</span>
+                            <span class="bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-medium flex items-center">🎬 Видео</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Capabilities and Limitations -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <h4 class="text-xl font-bold mb-6 text-center">Возможности и ограничения нейросетей</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+                            <div class="bg-green-50 p-4">
+                                <h5 class="font-bold text-green-700 flex items-center">
+                                    <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                    Что нейросети делают хорошо
+                                </h5>
+                            </div>
+                            <div class="p-6 space-y-3">
+                                <div class="flex items-start gap-3"><span class="text-green-500 font-bold">1.</span><p class="text-sm text-gray-600">Генерируют связные тексты различных жанров и стилей</p></div>
+                                <div class="flex items-start gap-3"><span class="text-green-500 font-bold">2.</span><p class="text-sm text-gray-600">Структурируют и обобщают информацию</p></div>
+                                <div class="flex items-start gap-3"><span class="text-green-500 font-bold">3.</span><p class="text-sm text-gray-600">Переводят между языками (в том числе специфическими диалектами или стилями общения)</p></div>
+                                <div class="flex items-start gap-3"><span class="text-green-500 font-bold">4.</span><p class="text-sm text-gray-600">Генерируют идеи и варианты для любого проекта, исследования или идеи</p></div>
+                                <div class="flex items-start gap-3"><span class="text-green-500 font-bold">5.</span><p class="text-sm text-gray-600">Создают шаблоны, планы, черновики</p></div>
+                                <div class="flex items-start gap-3"><span class="text-green-500 font-bold">6.</span><p class="text-sm text-gray-600">Адаптируют тексты для разного уровня подготовки</p></div>
+                                <div class="flex items-start gap-3"><span class="text-green-500 font-bold">7.</span><p class="text-sm text-gray-600">Работают с несколькими форматами данных одновременно (текст, изображения)</p></div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+                            <div class="bg-red-50 p-4">
+                                <h5 class="font-bold text-red-700 flex items-center">
+                                    <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                    Что нейросети делают плохо или не делают вовсе
+                                </h5>
+                            </div>
+                            <div class="p-6 space-y-3">
+                                <div class="flex items-start gap-3"><span class="text-red-500 font-bold">1.</span><p class="text-sm text-gray-600">Не гарантируют фактическую точность (могут «выдумывать» факты, даты, цитаты)</p></div>
+                                <div class="flex items-start gap-3"><span class="text-red-500 font-bold">2.</span><p class="text-sm text-gray-600">Не имеют собственного опыта, эмоций и ценностей</p></div>
+                                <div class="flex items-start gap-3"><span class="text-red-500 font-bold">3.</span><p class="text-sm text-gray-600">Не всегда корректно работают с актуальной информацией</p></div>
+                                <div class="flex items-start gap-3"><span class="text-red-500 font-bold">4.</span><p class="text-sm text-gray-600">Могут воспроизводить предвзятости, заложенные в обучающих данных</p></div>
+                                <div class="flex items-start gap-3"><span class="text-red-500 font-bold">5.</span><p class="text-sm text-gray-600">Не заменяют экспертную оценку в специализированных областях</p></div>
+                                <div class="flex items-start gap-3"><span class="text-red-500 font-bold">6.</span><p class="text-sm text-gray-600">Могут давать разные ответы на один и тот же вопрос при повторных обращениях</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Russian AI -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <h4 class="text-xl font-bold mb-6 text-center">Российские нейросети</h4>
+                    <p class="text-gray-600 text-center mb-6">Для педагогов будет особенно актуально знакомство с отечественными разработками, которые учитывают специфику русского языка и доступны без дополнительных технических сложностей. Принципы работы со всеми нейросетями абсолютно идентичны!</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-200 card-hover">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">G</div>
+                                <div>
+                                    <h5 class="text-xl font-bold text-green-800">GigaChat (Сбер)</h5>
+                                    <span class="text-green-600 text-sm">Бесплатно</span>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 text-sm mb-4">Большая языковая модель, доступная бесплатно через веб-интерфейс, мобильное приложение или чаты в соц. сетях. Хорошо работает с русским языком, способна генерировать тексты, отвечать на вопросы, составлять планы, помогать в подготовке учебных материалов. Поддерживает работу с изображениями (мультимодальный режим). Также включает генератор изображений Kandinsky.</p>
+                            <div class="info-card p-3 rounded-lg">
+                                <p class="text-xs text-gray-600"><strong>Как начать:</strong> перейдите на сайт GigaChat или откройте приложение на смартфоне, или найдите бота в мессенджере.</p>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-8 border border-yellow-200 card-hover">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center text-white font-bold text-xl">Y</div>
+                                <div>
+                                    <h5 class="text-xl font-bold text-yellow-800">YandexGPT (Яндекс)</h5>
+                                    <span class="text-yellow-600 text-sm">Бесплатно</span>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 text-sm mb-4">Языковая модель, интегрированная в сервисы Яндекса. Доступна через Алису (голосовой ассистент), через Яндекс Браузер и отдельный интерфейс. Хорошо справляется с задачами на русском языке: пересказ, обобщение, генерация текстов, ответы на вопросы.</p>
+                            <div class="info-card p-3 rounded-lg">
+                                <p class="text-xs text-gray-600"><strong>Как начать:</strong> откройте Яндекс Браузер и обратитесь к встроенному ассистенту или используйте Алису на любом устройстве.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="max-w-3xl mx-auto mt-6">
+                        <p class="text-gray-600 text-sm text-center mb-4">При этом, на сегодняшний день доступны и аналоги:</p>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <a href="https://chat.qwen.ai/" target="_blank" class="bg-blue-50 text-blue-700 px-4 py-2 rounded-full hover:bg-blue-100 transition font-medium">chat.qwen.ai</a>
+                            <a href="https://www.deepseek.com/" target="_blank" class="bg-blue-50 text-blue-700 px-4 py-2 rounded-full hover:bg-blue-100 transition font-medium">deepseek.com</a>
+                        </div>
+                        <div class="warning-card p-4 rounded-xl mt-6 max-w-2xl mx-auto">
+                            <p class="text-sm text-gray-700"><strong>Рекомендация:</strong> начните знакомство с нейросетями именно с этих инструментов. Они бесплатны, не требуют VPN, хорошо работают с русским языком и постоянно обновляются.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Topic 1.2 -->
+            <div id="topic1-2" class="mb-16 animate-fade-in">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold text-xl shadow-lg">1.2</div>
+                    <div>
+                        <h3 class="text-2xl md:text-3xl font-bold">Использование нейросетей в работе педагога</h3>
+                    </div>
+                </div>
+
+                <div class="max-w-5xl mx-auto mb-10">
+                    <div class="gradient-blue rounded-2xl p-8 text-white">
+                        <p class="text-lg leading-relaxed">
+                            Сегодня мы уже абсолютно уверены, что <strong>нейросеть — это не замена педагогу, а универсальный инструмент</strong>, который может высвободить время для самого важного: живого общения с учениками, индивидуального подхода, творческого проектирования.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Use Case 1: Planning -->
+                <div class="max-w-5xl mx-auto mb-10">
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="bg-indigo-50 p-6">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold">1</div>
+                                <h4 class="text-xl font-bold text-indigo-800">Планирование и подготовка к урокам</h4>
+                            </div>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-3">
+                                        <span class="text-indigo-500 font-bold text-sm mt-0.5">•</span>
+                                        <p class="text-sm text-gray-600"><strong>Генерация идей для уроков.</strong> Вы можете описать тему, класс, желаемый результат и получить несколько вариантов сценариев урока.</p>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <span class="text-indigo-500 font-bold text-sm mt-0.5">•</span>
+                                        <p class="text-sm text-gray-600"><strong>Создание дидактических материалов.</strong> Карточки с заданиями, кроссворды, ситуационные задачи.</p>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <span class="text-indigo-500 font-bold text-sm mt-0.5">•</span>
+                                        <p class="text-sm text-gray-600"><strong>Дифференциация заданий.</strong> Попросите нейросеть адаптировать одно и то же задание для трёх уровней сложности.</p>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <span class="text-indigo-500 font-bold text-sm mt-0.5">•</span>
+                                        <p class="text-sm text-gray-600"><strong>Составление рубрик оценивания.</strong> Нейросеть может предложить критерии оценки проектов, эссе, выступлений.</p>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-700 mb-2">Пример промпта:</p>
+                                <div class="prompt-card p-4 rounded-lg text-sm text-gray-700 mb-4">
+                                    «Составь три варианта задания по теме «Системы измерений» для 7 класса: базовый уровень, повышенный уровень и задание для одарённых учеников. Каждое задание должно включать работу с текстом и элемент творчества.»
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Use Case 2: Text Creation -->
+                <div class="max-w-5xl mx-auto mb-10">
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="bg-purple-50 p-6">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold">2</div>
+                                <h4 class="text-xl font-bold text-purple-800">Создание и адаптация учебных текстов</h4>
+                            </div>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-3"><span class="text-purple-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Упрощение сложных научных текстов для определённого возраста</p></li>
+                                    <li class="flex items-start gap-3"><span class="text-purple-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Перевод учебного материала на другой язык</p></li>
+                                    <li class="flex items-start gap-3"><span class="text-purple-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Создание адаптированных текстов для детей с особыми образовательными потребностями</p></li>
+                                    <li class="flex items-start gap-3"><span class="text-purple-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Генерация примеров, аналогий, метафор для объяснения сложных понятий</p></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-700 mb-2">Пример промпта:</p>
+                                <div class="prompt-card p-4 rounded-lg text-sm text-gray-700 mb-4">
+                                    «Объясни принцип работы двигателя внутреннего сгорания для ученика 8 класса. Используй бытовые аналогии. Текст должен быть не более 200 слов.»
+                                </div>
+                                <p class="text-sm font-semibold text-gray-700 mb-2">Пример ответа:</p>
+                                <div class="response-card p-4 rounded-lg text-sm text-gray-700">
+                                    Представь обычный велосипедный насос. Когда ты давишь на ручку — поршень внутри идёт вниз и сжимает воздух. А теперь вообрази, что вместо твоих рук поршень толкают маленькие взрывы бензина. Это и есть двигатель!<br><br>
+                                    Внутри двигателя есть цилиндр — металлический «стакан», в котором ходит вверх-вниз поршень. Работа происходит в 4 такта — как четыре движения одного танца:<br>
+                                    <strong>1. Впуск.</strong> Поршень идёт вниз и «вдыхает» смесь бензина с воздухом.<br>
+                                    <strong>2. Сжатие.</strong> Поршень идёт вверх и сильно сжимает эту смесь.<br>
+                                    <strong>3. Рабочий ход.</strong> Свеча даёт искру — смесь взрывается и с силой толкает поршень вниз. Это главный момент!<br>
+                                    <strong>4. Выпуск.</strong> Поршень снова идёт вверх и выталкивает отработанные газы наружу.<br><br>
+                                    Поршень соединён с валом, который превращает движение «вверх-вниз» во вращение колёс. Так маленькие взрывы 1000 раз в минуту везут машину вперёд!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Use Case 3: Assessment -->
+                <div class="max-w-5xl mx-auto mb-10">
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="bg-green-50 p-6">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">3</div>
+                                <h4 class="text-xl font-bold text-green-800">Оценивание и обратная связь</h4>
+                            </div>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-3"><span class="text-green-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Генерация вариантов тестовых заданий</p></li>
+                                    <li class="flex items-start gap-3"><span class="text-green-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Создание чек-листов для самопроверки учащихся</p></li>
+                                    <li class="flex items-start gap-3"><span class="text-green-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Формулирование развёрнутой обратной связи на основе критериев</p></li>
+                                    <li class="flex items-start gap-3"><span class="text-green-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Анализ типичных ошибок</p></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-700 mb-2">Пример промпта:</p>
+                                <div class="prompt-card p-4 rounded-lg text-sm text-gray-700">
+                                    «Ты — учитель математики. Ученик 7 класса решил уравнение 3(x + 2) = 15 и получил ответ x = 7. Составь развёрнутую обратную связь: укажи, где допущена ошибка, объясни правильный ход решения, предложи аналогичное уравнение для закрепления.»
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Use Case 4: Parents -->
+                <div class="max-w-5xl mx-auto mb-10">
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="bg-blue-50 p-6">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">4</div>
+                                <h4 class="text-xl font-bold text-blue-800">Работа с родителями и документацией</h4>
+                            </div>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-3"><span class="text-blue-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Составление шаблонов писем для родителей</p></li>
+                                    <li class="flex items-start gap-3"><span class="text-blue-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Подготовка характеристик и рекомендаций (без указания персональных данных в нейросети)</p></li>
+                                    <li class="flex items-start gap-3"><span class="text-blue-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Анализ файлов и создание информационных материалов о мероприятиях</p></li>
+                                    <li class="flex items-start gap-3"><span class="text-blue-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Формулирование повестки родительских собраний</p></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-700 mb-2">Пример промпта:</p>
+                                <div class="prompt-card p-4 rounded-lg text-sm text-gray-700">
+                                    «Составь план родительского собрания в 5 классе на тему «Безопасность ребёнка в интернете». Включи 3–4 основных вопроса для обсуждения и практические рекомендации, которые можно распечатать как памятку.»
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Use Case 5: Professional Development -->
+                <div class="max-w-5xl mx-auto mb-10">
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="bg-pink-50 p-6">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center text-white font-bold">5</div>
+                                <h4 class="text-xl font-bold text-pink-800">Профессиональное развитие</h4>
+                            </div>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-3"><span class="text-pink-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Обобщение педагогических статей и исследований</p></li>
+                                    <li class="flex items-start gap-3"><span class="text-pink-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Подготовка выступлений и презентаций</p></li>
+                                    <li class="flex items-start gap-3"><span class="text-pink-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Рефлексия педагогического опыта</p></li>
+                                    <li class="flex items-start gap-3"><span class="text-pink-500 font-bold text-sm mt-0.5">•</span><p class="text-sm text-gray-600">Изучение новых методик через диалог с ИИ</p></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-700 mb-2">Пример промпта:</p>
+                                <div class="prompt-card p-4 rounded-lg text-sm text-gray-700">
+                                    «Я учитель начальных классов и хочу попробовать технологию «перевёрнутого класса». Объясни суть этой методики, её преимущества и ограничения. Приведи пример, как можно организовать урок по окружающему миру в 3 классе с использованием этого подхода.»
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Practicum -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 border border-amber-200">
+                        <h4 class="text-xl font-bold text-amber-800 mb-6 flex items-center">
+                            <svg class="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                            Практикум: пошаговое начало работы с нейросетью
+                        </h4>
+                        <p class="text-gray-600 mb-6">Если вы ещё ни разу не использовали нейросеть, вот простой алгоритм первого знакомства:</p>
+                        <div class="space-y-6">
+                            <div class="flex gap-4">
+                                <div class="w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+                                <div class="bg-white rounded-xl p-4 shadow-sm flex-1">
+                                    <p class="font-semibold text-gray-800">Откройте GigaChat</p>
+                                    <p class="text-sm text-gray-600">Через браузер или приложение — или другую большую нейросеть</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                                <div class="bg-white rounded-xl p-4 shadow-sm flex-1">
+                                    <p class="font-semibold text-gray-800">Начните с простого запроса по вашему предмету</p>
+                                    <div class="prompt-card p-3 rounded-lg text-sm text-gray-700 mt-2">
+                                        «Представь, что ты хороший учитель истории. Придумай 5 интересных фактов о Древнем Египте для урока истории в 5 классе.»
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                                <div class="bg-white rounded-xl p-4 shadow-sm flex-1">
+                                    <p class="font-semibold text-gray-800">Оцените результат</p>
+                                    <p class="text-sm text-gray-600">Проверьте факты по учебнику или надёжному источнику. Обратите внимание: всё ли корректно?</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">4</div>
+                                <div class="bg-white rounded-xl p-4 shadow-sm flex-1">
+                                    <p class="font-semibold text-gray-800">Уточните запрос, если результат вас не устроил</p>
+                                    <div class="prompt-card p-3 rounded-lg text-sm text-gray-700 mt-2">
+                                        «Сделай факты более необычными, чтобы они удивили детей. Избегай очевидных сведений о пирамидах и фараонах.»
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">5</div>
+                                <div class="bg-white rounded-xl p-4 shadow-sm flex-1">
+                                    <p class="font-semibold text-gray-800">Используйте полученный материал как основу</p>
+                                    <p class="text-sm text-gray-600">Отредактируйте, дополните, адаптируйте под конкретный класс.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prompt Engineering -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <h4 class="text-xl font-bold mb-6 text-center">Правила эффективного взаимодействия с нейросетью</h4>
+                    <p class="text-gray-600 text-center mb-6"><strong>Промпт</strong> — это запрос (инструкция), который вы даёте нейросети. Качество результата напрямую зависит от качества промпта.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+                        <div class="bg-white rounded-xl p-5 text-center shadow-sm card-hover">
+                            <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-600 font-bold text-xl">1</div>
+                            <h5 class="font-bold text-lg mb-2">Роль</h5>
+                            <p class="text-sm text-gray-600">Укажите, в какой роли должна действовать нейросеть</p>
+                        </div>
+                        <div class="bg-white rounded-xl p-5 text-center shadow-sm card-hover">
+                            <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 text-purple-600 font-bold text-xl">2</div>
+                            <h5 class="font-bold text-lg mb-2">Контекст</h5>
+                            <p class="text-sm text-gray-600">Опишите ситуацию и условия</p>
+                        </div>
+                        <div class="bg-white rounded-xl p-5 text-center shadow-sm card-hover">
+                            <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3 text-indigo-600 font-bold text-xl">3</div>
+                            <h5 class="font-bold text-lg mb-2">Задача</h5>
+                            <p class="text-sm text-gray-600">Чётко сформулируйте, что нужно сделать</p>
+                        </div>
+                        <div class="bg-white rounded-xl p-5 text-center shadow-sm card-hover">
+                            <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 text-green-600 font-bold text-xl">4</div>
+                            <h5 class="font-bold text-lg mb-2">Формат</h5>
+                            <p class="text-sm text-gray-600">Укажите желаемый вид результата</p>
+                        </div>
+                        <div class="bg-white rounded-xl p-5 text-center shadow-sm card-hover">
+                            <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 text-orange-600 font-bold text-xl">5</div>
+                            <h5 class="font-bold text-lg mb-2">Ограничения</h5>
+                            <p class="text-sm text-gray-600">Обозначьте, чего следует избегать</p>
+                        </div>
+                    </div>
+                    <div class="max-w-3xl mx-auto">
+                        <div class="bg-white rounded-xl shadow-sm p-6">
+                            <p class="text-sm font-semibold text-gray-700 mb-3">Примеры элементов промпта:</p>
+                            <div class="space-y-2 text-sm">
+                                <div class="prompt-card p-3 rounded-lg"><strong>Роль:</strong> «Ты — опытный учитель русского языка в 7 классе.»</div>
+                                <div class="prompt-card p-3 rounded-lg"><strong>Контекст:</strong> «Ученики готовятся к контрольной работе по теме "Причастие". Уровень класса — средний.»</div>
+                                <div class="prompt-card p-3 rounded-lg"><strong>Задача:</strong> «Составь 10 заданий разного типа: 5 заданий с выбором ответа, 3 задания с кратким ответом, 2 задания с развёрнутым ответом.»</div>
+                                <div class="prompt-card p-3 rounded-lg"><strong>Формат:</strong> «Оформи в виде таблицы с колонками: номер задания, текст задания, правильный ответ, уровень сложности.»</div>
+                                <div class="prompt-card p-3 rounded-lg"><strong>Ограничения:</strong> «Не используй примеры из несертифицированных учебников»</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Common Mistakes -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <h4 class="text-xl font-bold mb-6 text-center">Типичные ошибки при работе с нейросетями и как их избежать</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full bg-white rounded-xl shadow-sm overflow-hidden">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="text-left p-4 font-semibold text-gray-700 w-1/4">Ошибка</th>
+                                    <th class="text-left p-4 font-semibold text-gray-700 w-1/4">Почему это проблема</th>
+                                    <th class="text-left p-4 font-semibold text-gray-700 w-1/2">Что делать вместо этого</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr>
+                                    <td class="p-4 text-sm text-red-600 font-medium">Слишком общий запрос: «Придумай урок»</td>
+                                    <td class="p-4 text-sm text-gray-600">Нейросеть выдаст шаблонный и поверхностный результат</td>
+                                    <td class="p-4 text-sm text-green-700">Укажите предмет, класс, тему, тип урока, желаемые виды деятельности</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 text-sm text-red-600 font-medium">Полное доверие к сгенерированному тексту</td>
+                                    <td class="p-4 text-sm text-gray-600">Нейросеть может «выдумать» факты, даты, цитаты</td>
+                                    <td class="p-4 text-sm text-green-700">Всегда проверяйте фактическую сторону по надёжным источникам</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 text-sm text-red-600 font-medium">Ввод персональных данных учеников</td>
+                                    <td class="p-4 text-sm text-gray-600">Нарушение требований закона о персональных данных</td>
+                                    <td class="p-4 text-sm text-green-700">Никогда не указывайте имена, оценки, характеристики конкретных детей</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 text-sm text-red-600 font-medium">Использование одного и того же промпта без итерации</td>
+                                    <td class="p-4 text-sm text-gray-600">Первый результат редко бывает идеальным</td>
+                                    <td class="p-4 text-sm text-green-700">Уточняйте, дополняйте, переформулируйте запрос в диалоге</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 text-sm text-red-600 font-medium">Копирование результата без редактирования</td>
+                                    <td class="p-4 text-sm text-gray-600">Материал может не соответствовать вашему стилю, уровню класса</td>
+                                    <td class="p-4 text-sm text-green-700">Используйте результат нейросети как черновик и основу для собственной доработки</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="max-w-3xl mx-auto mt-6">
+                        <div class="gradient-purple rounded-xl p-6 text-white text-center">
+                            <p class="font-semibold">Используйте нейросеть как помощника, а не как автора.</p>
+                            <p class="text-sm opacity-90 mt-2">Итоговый материал является результатом вашего профессионального суждения. Если уместно, сообщайте коллегам и ученикам об использовании ИИ в подготовке материалов и помните: нейросеть должна высвобождать ваше время для более сложной и творческой работы, а не заменять ваше профессиональное мышление.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Topic 1.3 -->
+            <div id="topic1-3" class="mb-16 animate-fade-in">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-teal-600 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold text-xl shadow-lg">1.3</div>
+                    <div>
+                        <h3 class="text-2xl md:text-3xl font-bold">Оценивание работ учеников, использующих нейросети</h3>
+                    </div>
+                </div>
+
+                <div class="max-w-5xl mx-auto mb-10">
+                    <div class="bg-red-50 border-l-4 border-red-400 rounded-r-xl p-6">
+                        <h4 class="text-lg font-bold text-red-800 mb-2">Новая реальность</h4>
+                        <p class="text-gray-700 text-sm">Согласно многочисленным исследованиям 2023–2026 годов, значительная часть школьников уже пользуется нейросетями для выполнения учебных заданий. Эта тенденция будет только нарастать. Поэтому вопрос стоит не «как запретить?», а <strong>«как выстроить образовательный процесс в новых условиях?»</strong></p>
+                    </div>
+                </div>
+
+                <!-- Three Strategies -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <h4 class="text-xl font-bold mb-6 text-center">Три стратегии работы с ИИ в учебном процессе</h4>
+                    
+                    <!-- Strategy 1 -->
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover mb-6">
+                        <div class="bg-red-50 p-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center text-white font-bold">1</div>
+                                <div>
+                                    <h5 class="text-lg font-bold text-red-800">Задания, в которых использование ИИ запрещено</h5>
+                                    <p class="text-sm text-red-600">Ситуации, когда важно оценить именно самостоятельные навыки ученика</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-sm text-gray-600 mb-4">Контрольные работы, экзамены, диагностические работы.</p>
+                            <h6 class="font-semibold text-gray-700 mb-3">Как обеспечить самостоятельность:</h6>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="flex items-start gap-2 text-sm text-gray-600"><span class="text-red-500 mt-0.5">•</span>Проведение работ в контролируемой среде (в классе, без доступа к устройствам)</div>
+                                <div class="flex items-start gap-2 text-sm text-gray-600"><span class="text-red-500 mt-0.5">•</span>Устные ответы и защита работ</div>
+                                <div class="flex items-start gap-2 text-sm text-gray-600"><span class="text-red-500 mt-0.5">•</span>Задания, привязанные к личному опыту ученика</div>
+                                <div class="flex items-start gap-2 text-sm text-gray-600"><span class="text-red-500 mt-0.5">•</span>Рефлексивные задания: «Опиши, как ты пришёл к этому решению»</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Strategy 2 -->
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover mb-6">
+                        <div class="bg-blue-50 p-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">2</div>
+                                <div>
+                                    <h5 class="text-lg font-bold text-blue-800">Задания, в которых использование ИИ разрешено как инструмент</h5>
+                                    <p class="text-sm text-blue-600">Ученик может использовать нейросеть, но должен продемонстрировать собственную работу</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h6 class="font-semibold text-gray-700 mb-3">Примеры:</h6>
+                            <div class="space-y-2 text-sm text-gray-600 mb-4">
+                                <p>• Ученик просит нейросеть сгенерировать черновик эссе, а затем критически его анализирует, редактирует и дополняет собственными аргументами.</p>
+                                <p>• Ученик использует нейросеть для поиска информации, но обязан проверить её по другим источникам.</p>
+                                <p>• Ученик генерирует несколько вариантов решения задачи и аргументирует, какой из них верный.</p>
+                            </div>
+                            <h6 class="font-semibold text-gray-700 mb-2">Что оценивается:</h6>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
+                                <p>• Качество редактирования и доработки</p>
+                                <p>• Критический анализ сгенерированного контента</p>
+                                <p>• Способность выявлять ошибки нейросети</p>
+                                <p>• Оригинальность авторской позиции</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Strategy 3 -->
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="bg-green-50 p-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">3</div>
+                                <div>
+                                    <h5 class="text-lg font-bold text-green-800">Задания, в которых работа с ИИ — это цель обучения</h5>
+                                    <p class="text-sm text-green-600">Ученик целенаправленно учится эффективно использовать нейросети</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h6 class="font-semibold text-gray-700 mb-3">Примеры:</h6>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
+                                <p>• Составление и оптимизация промптов для получения наилучшего результата</p>
+                                <p>• Сравнительный анализ ответов нескольких нейросетей</p>
+                                <p>• Выявление «галлюцинаций» и предвзятостей ИИ</p>
+                                <p>• Создание проекта с использованием ИИ как инструмента</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Method of Three Layers -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <h4 class="text-xl font-bold mb-6 text-center">Практические инструменты</h4>
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                        <div class="bg-indigo-50 p-6">
+                            <h5 class="text-lg font-bold text-indigo-800">1. «Метод трёх слоёв» для проверки работ</h5>
+                            <p class="text-sm text-indigo-600">Если вы подозреваете, что работа полностью сгенерирована нейросетью</p>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-6">
+                                <div class="border-l-4 border-blue-400 pl-4">
+                                    <h6 class="font-bold text-blue-700 mb-2">Слой 1: Признаки текста, сгенерированного ИИ</h6>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
+                                        <p>• Идеальная грамматика при нетипичном для ученика уровне письма</p>
+                                        <p>• Общие формулировки без конкретных примеров из личного опыта</p>
+                                        <p>• Равномерная структура абзацев</p>
+                                        <p>• Характерные «водные» обороты: «в современном мире», «на протяжении всей истории человечества»</p>
+                                        <p>• Отсутствие ошибок, характерных для данного ученика</p>
+                                        <p>• Резкое несоответствие уровню предыдущих работ</p>
+                                    </div>
+                                </div>
+                                <div class="border-l-4 border-purple-400 pl-4">
+                                    <h6 class="font-bold text-purple-700 mb-2">Слой 2: Проверочная беседа</h6>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
+                                        <p>• Попросите ученика объяснить ключевые тезисы своей работы</p>
+                                        <p>• Задайте уточняющие вопросы по содержанию</p>
+                                        <p>• Попросите привести дополнительный пример или аргумент</p>
+                                        <p>• Предложите ученику развить одну из идей устно</p>
+                                    </div>
+                                </div>
+                                <div class="border-l-4 border-green-400 pl-4">
+                                    <h6 class="font-bold text-green-700 mb-2">Слой 3: Формирующая оценка</h6>
+                                    <div class="space-y-2 text-sm text-gray-600">
+                                        <p>• Если выяснится, что ученик воспользовался ИИ без разрешения, используйте это как обучающий момент</p>
+                                        <p>• Обсудите, что именно ученик мог бы сделать самостоятельно</p>
+                                        <p>• Предложите переделать работу с документированием процесса</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI-Resistant Tasks -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <div class="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl p-8 border border-teal-200">
+                        <h5 class="text-xl font-bold text-teal-800 mb-4">2. Дизайн «ИИ-устойчивых» заданий</h5>
+                        <p class="text-sm text-teal-600 mb-4">Задания, которые сложно выполнить простым копированием ответа нейросети:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white rounded-xl p-4 shadow-sm">
+                                <p class="text-sm font-semibold text-teal-700 mb-1">Задания на личный опыт</p>
+                                <p class="text-xs text-gray-600 italic">«Опиши эксперимент, который ты провёл на прошлом уроке. Какие результаты ты получил?»</p>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 shadow-sm">
+                                <p class="text-sm font-semibold text-teal-700 mb-1">Задания на связь с локальным контекстом</p>
+                                <p class="text-xs text-gray-600 italic">«Исследуй экологическую ситуацию в нашем районе. Какие проблемы ты выявил?»</p>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 shadow-sm">
+                                <p class="text-sm font-semibold text-teal-700 mb-1">Задания на метапознание</p>
+                                <p class="text-xs text-gray-600 italic">«Какой из изученных методов решения уравнений кажется тебе самым удобным? Почему?»</p>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 shadow-sm">
+                                <p class="text-sm font-semibold text-teal-700 mb-1">Мультимодальные задания</p>
+                                <p class="text-xs text-gray-600">Сочетание текста, рисунка от руки, устного выступления, физического эксперимента</p>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 shadow-sm">
+                                <p class="text-sm font-semibold text-teal-700 mb-1">Задания с этапами</p>
+                                <p class="text-xs text-gray-600">Ученик сдаёт не только финальную работу, но и план, черновик, список источников, дневник работы</p>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 shadow-sm">
+                                <p class="text-sm font-semibold text-teal-700 mb-1">Дискуссионные задания</p>
+                                <p class="text-xs text-gray-600">Где оценивается живое участие в обсуждении в классе</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- How to Talk to Students -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <h4 class="text-xl font-bold mb-6 text-center">Как вести разговор с учениками об ИИ</h4>
+                    <p class="text-gray-600 text-center mb-6">Одна из важных задач педагога — инициировать открытый разговор с учениками об использовании нейросетей.</p>
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-xl p-6 shadow-sm card-hover">
+                            <h5 class="font-bold text-indigo-700 mb-2">🗣️ Не начинайте с запретов</h5>
+                            <p class="text-sm text-gray-600">Начните с вопросов: «Кто из вас уже пользовался нейросетями? Для каких задач? Что получилось, а что нет?» Это покажет ученикам, что вы готовы к диалогу, а не к конфронтации.</p>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-sm card-hover">
+                            <h5 class="font-bold text-indigo-700 mb-2">🔍 Покажите ограничения ИИ на практике</h5>
+                            <p class="text-sm text-gray-600">Попросите нейросеть (например, GigaChat) ответить на вопрос по вашему предмету при классе. Вместе с учениками проанализируйте ответ: что верно, что неточно, чего не хватает. Это гораздо убедительнее любых лекций о «вреде списывания».</p>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-sm card-hover">
+                            <h5 class="font-bold text-indigo-700 mb-2">📝 Сформулируйте правила вместе</h5>
+                            <p class="text-sm text-gray-600">Предложите классу совместно выработать правила использования ИИ. Когда ученики участвуют в создании правил, они с большей вероятностью будут их соблюдать.</p>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-sm card-hover">
+                            <h5 class="font-bold text-indigo-700 mb-2">💡 Объясните, зачем нужны ограничения</h5>
+                            <p class="text-sm text-gray-600">Ученикам важно понимать, что запрет на ИИ при контрольной работе связан не с недоверием, а с необходимостью убедиться, что навык действительно сформирован. <em>Спортсмен тренируется без допинга не потому, что допинг недоступен, а потому, что цель тренировки — развить собственные возможности.</em></p>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-sm card-hover">
+                            <h5 class="font-bold text-indigo-700 mb-2">🤝 Делитесь собственным опытом</h5>
+                            <p class="text-sm text-gray-600">Расскажите ученикам, как вы сами используете нейросети в работе. Это нормализует тему и формирует модель ответственного использования.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Topic 1.4 -->
+            <div id="topic1-4" class="mb-16 animate-fade-in">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-14 h-14 bg-gradient-to-br from-teal-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold text-xl shadow-lg">1.4</div>
+                    <div>
+                        <h3 class="text-2xl md:text-3xl font-bold">Нейросети и инклюзивное образование</h3>
+                    </div>
+                </div>
+
+                <p class="text-gray-600 text-center mb-8 max-w-3xl mx-auto">Нейросети могут стать ценным инструментом для создания инклюзивной образовательной среды.</p>
+
+                <!-- Categories -->
+                <div class="max-w-5xl mx-auto space-y-8 mb-10">
+                    <!-- Learning Difficulties -->
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="bg-blue-50 p-6">
+                            <h5 class="text-lg font-bold text-blue-800 flex items-center gap-3">
+                                <span class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">🎯</span>
+                                Для учеников с трудностями в обучении
+                            </h5>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <ul class="space-y-2 text-sm text-gray-600">
+                                    <li>• Упрощение текстов до нужного уровня сложности</li>
+                                    <li>• Создание пошаговых инструкций и визуальных опор</li>
+                                    <li>• Генерация дополнительных примеров и объяснений разными способами</li>
+                                    <li>• Подготовка индивидуальных заданий с учётом темпа работы ученика</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-700 mb-2">Пример промпта:</p>
+                                <div class="prompt-card p-4 rounded-lg text-sm text-gray-700">
+                                    «Перепиши параграф учебника о круговороте воды в природе для ученика 4 класса с задержкой психического развития. Используй простые предложения (не более 8 слов), добавь к каждому предложению подсказку-ассоциацию. Текст не должен превышать 100 слов.»
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gifted Students -->
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="bg-purple-50 p-6">
+                            <h5 class="text-lg font-bold text-purple-800 flex items-center gap-3">
+                                <span class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">⭐</span>
+                                Для одарённых учеников
+                            </h5>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <ul class="space-y-2 text-sm text-gray-600">
+                                    <li>• Генерация усложнённых заданий и олимпиадных задач</li>
+                                    <li>• Создание междисциплинарных проектов</li>
+                                    <li>• Подготовка материалов для углублённого изучения темы</li>
+                                    <li>• Формулирование исследовательских вопросов</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-700 mb-2">Пример промпта:</p>
+                                <div class="prompt-card p-4 rounded-lg text-sm text-gray-700">
+                                    «Составь три исследовательских вопроса по теме "Золотое сечение" для ученика 8 класса, увлекающегося математикой. Вопросы должны связывать математику с биологией, архитектурой и искусством. К каждому вопросу предложи направление для мини-исследования.»
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Non-native Speakers -->
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="bg-green-50 p-6">
+                            <h5 class="text-lg font-bold text-green-800 flex items-center gap-3">
+                                <span class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">🌍</span>
+                                Для учеников, для которых русский язык не является родным
+                            </h5>
+                        </div>
+                        <div class="p-6">
+                            <ul class="space-y-2 text-sm text-gray-600">
+                                <li>• Перевод ключевых терминов и понятий</li>
+                                <li>• Создание двуязычных глоссариев</li>
+                                <li>• Генерация адаптированных текстов с пояснениями незнакомой лексики</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Important Notes -->
+                <div class="max-w-5xl mx-auto">
+                    <div class="warning-card p-6 rounded-xl">
+                        <h5 class="font-bold text-amber-800 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            Важные оговорки
+                        </h5>
+                        <p class="text-sm text-gray-700 mb-2">Применяя нейросети для инклюзивного образования, помните:</p>
+                        <ol class="list-decimal list-inside space-y-2 text-sm text-gray-600">
+                            <li><strong>Не вводите в нейросеть диагнозы, заключения ПМПК</strong> и другие персональные данные ученика. Формулируйте запрос обобщённо: «для ученика с трудностями в чтении», а не «для Иванова Пети с диагнозом…»</li>
+                            <li><strong>Сгенерированные материалы необходимо проверять</strong> и адаптировать с учётом рекомендаций специалистов (дефектологов, логопедов, психологов).</li>
+                            <li><strong>Нейросеть не заменяет профессиональное сопровождение</strong> ребёнка с ОВЗ, но может облегчить подготовку дидактических материалов.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module 1 Summary -->
+            <div id="module1-summary" class="mb-16 animate-fade-in">
+                <div class="max-w-5xl mx-auto">
+                    <div class="gradient-blue rounded-2xl p-8 text-white">
+                        <h4 class="text-2xl font-bold mb-6">Итоги Модуля 1</h4>
+                        <p class="text-lg leading-relaxed mb-6 opacity-95">Нейросети — это реальность, которую невозможно игнорировать. Задача педагога не в том, чтобы запрещать, а в том, чтобы учить осмысленному, этичному и продуктивному использованию ИИ, одновременно перестраивая систему заданий и оценивания так, чтобы она сохраняла свою образовательную ценность.</p>
+                        <h5 class="text-xl font-bold mb-4">Ключевые выводы:</h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                                <p class="text-sm">1. Нейросети работают на основе статистических закономерностей, а не понимания. Они мощный инструмент, но не замена педагогу и эксперту.</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                                <p class="text-sm">2. Российские нейросети (GigaChat, YandexGPT) доступны бесплатно, хорошо работают с русским языком и подходят для начала практики.</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                                <p class="text-sm">3. Качество результата зависит от качества промпта. Освоив базовые принципы промпт-инжиниринга, вы сможете получать значительно более полезные ответы.</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                                <p class="text-sm">4. Любой сгенерированный контент требует обязательной проверки и профессиональной доработки.</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                                <p class="text-sm">5. Для оценивания работ учеников необходимо сочетать три стратегии: запрет ИИ, разрешение ИИ как инструмента, целенаправленное обучение работе с ИИ.</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                                <p class="text-sm">6. Открытый диалог с учениками об ИИ эффективнее запретов.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODULE 2 -->
+    <section id="module2" class="py-20 gradient-section">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12 animate-fade-in">
+                <div class="inline-block bg-purple-100 text-purple-700 px-4 py-1 rounded-full text-sm font-semibold mb-4">Модуль 2 — 2 академических часа</div>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Методические материалы для проведения уроков по ИИ</h2>
+                <div class="section-divider mx-auto w-20 mb-6"></div>
+            </div>
+
+            <!-- Intro -->
+            <div class="max-w-5xl mx-auto mb-12 animate-fade-in">
+                <div class="bg-white rounded-2xl shadow-lg p-8 border-l-4 border-purple-500">
+                    <h4 class="text-xl font-bold text-purple-700 mb-4">Готовые уроки от Благотворительного фонда «Вклад в будущее»</h4>
+                    <p class="text-gray-700 leading-relaxed mb-4">Благотворительный фонд «Вклад в будущее» рад представить вам комплект методических материалов, которые помогут провести уроки по теме искусственного интеллекта для учеников разных возрастных групп.</p>
+                    <p class="text-gray-700 leading-relaxed mb-4">Мы убеждены: чтобы дети могли уверенно ориентироваться в мире технологий, их нужно знакомить с возможностями и ограничениями искусственного интеллекта системно, понятно и увлекательно. Именно поэтому мы подготовили набор готовых сценариев уроков, которые вы можете использовать в своей практике как целиком, так и адаптируя под свои задачи.</p>
+                    <p class="text-gray-700 leading-relaxed mb-4">Каждый сценарий включает <strong>подробный план урока, раздаточные материалы, презентацию и рекомендации по проведению</strong>. Вам не нужно быть экспертом в технологиях — все материалы написаны доступным языком и рассчитаны на педагогов любых предметов.</p>
+                    <p class="text-gray-700 leading-relaxed">Мы надеемся, что эти материалы станут для вас надёжной опорой и вдохновят на то, чтобы говорить с учениками о технологиях открыто, компетентно и с интересом.</p>
+                    <p class="text-gray-700 mt-4 font-semibold text-purple-600">Желаем вам ярких уроков и вовлечённых учеников!</p>
+                </div>
+            </div>
+
+            <!-- Catalog Notes -->
+            <div class="max-w-5xl mx-auto mb-12 animate-fade-in">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                        <p class="text-sm text-blue-800"><strong>Выбирайте уроки</strong>, соответствующие возрасту и уровню подготовки ваших учеников. Некоторые уроки можно проводить не только для указанной возрастной категории, но и для более старших/младших.</p>
+                    </div>
+                    <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                        <p class="text-sm text-green-800"><strong>Не обязательно проводить все уроки.</strong> Вы можете выбрать один сценарий, который наиболее актуален для вашей группы.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category 1: Primary School -->
+            <div class="max-w-5xl mx-auto mb-12 animate-fade-in">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-xl flex items-center justify-center text-white">🌱</div>
+                    <div>
+                        <h4 class="text-2xl font-bold text-indigo-700">Категория 1. Начальная школа (1–4 классы)</h4>
+                        <p class="text-gray-600 text-sm">Знакомство с искусственным интеллектом через игру, сказку и повседневный опыт ребёнка.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="p-6">
+                            <div class="flex items-start gap-3 mb-3">
+                                <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full font-semibold">2026</span>
+                            </div>
+                            <h5 class="font-bold text-lg text-gray-800 mb-2">Урок «Космическая миссия»</h5>
+                            <p class="text-sm text-gray-600 mb-4">Игровое занятие, где младшеклассники в формате космического приключения знакомятся с понятием алгоритма и принципами командной работы — это база для дальнейшего понимания работы нейросетей.</p>
+                            <div class="space-y-2">
+                                <a href="https://htweek.ru/lessons/2026/" target="_blank" class="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    htweek.ru/lessons/2026/
+                                </a>
+                                <a href="https://disk.yandex.ru/d/Ib9E4tx0GerseA" target="_blank" class="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                                    Раздаточные материалы (Яндекс.Диск)
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="p-6">
+                            <div class="flex items-start gap-3 mb-3">
+                                <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full font-semibold">2024</span>
+                            </div>
+                            <h5 class="font-bold text-lg text-gray-800 mb-2">Урок цифры «ИИ: промпт-инжиниринг»</h5>
+                            <p class="text-sm text-gray-600 mb-4">Урок с готовым видеороликом, тренажёром и методичкой для педагога. В адаптированной версии простым языком объясняется, что такое нейросети и как с ними «разговаривать» — через понятные детям образы.</p>
+                            <a href="https://урокцифры.рф/lessons/prompt" target="_blank" class="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                урокцифры.рф/lessons/prompt
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category 2: Middle School -->
+            <div class="max-w-5xl mx-auto mb-12 animate-fade-in">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl flex items-center justify-center text-white">📚</div>
+                    <div>
+                        <h4 class="text-2xl font-bold text-purple-700">Категория 2. Основная школа (5–7 классы)</h4>
+                        <p class="text-gray-600 text-sm">Практическое знакомство с нейросетями, развитие навыков формулирования запросов и критического мышления.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="p-6">
+                            <div class="flex items-start gap-3 mb-3">
+                                <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-semibold">2026</span>
+                            </div>
+                            <h5 class="font-bold text-lg text-gray-800 mb-2">Серия уроков «ИИ-кинематограф: от сценария до визуализации»</h5>
+                            <p class="text-sm text-gray-600 mb-4">Серия из трёх уроков в формате проектной игры: школьники командами создают цифровой медиапродукт с помощью ИИ — от идеи и сценария до визуализации и защиты проекта.</p>
+                            <div class="space-y-2">
+                                <a href="https://htweek.ru/lessons/2026/" target="_blank" class="flex items-center gap-2 text-sm text-purple-600 hover:text-purple-800 transition">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    htweek.ru/lessons/2026/
+                                </a>
+                                <a href="https://disk.yandex.ru/d/k_d40Ws7ER5kfA" target="_blank" class="flex items-center gap-2 text-sm text-purple-600 hover:text-purple-800 transition">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                                    Раздаточные материалы (Яндекс.Диск)
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="p-6">
+                            <div class="flex items-start gap-3 mb-3">
+                                <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-semibold">2025</span>
+                            </div>
+                            <h5 class="font-bold text-lg text-gray-800 mb-2">Урок цифры «ИИ-агенты»</h5>
+                            <p class="text-sm text-gray-600 mb-4">Готовый комплект (видео + интерактивный тренажёр + методичка для педагога), созданный при поддержке Сбера и команды GigaChat. Школьники узнают, как устроены современные ИИ-агенты, и пробуют взаимодействовать с ними на тренажёре.</p>
+                            <a href="https://урокцифры.рф/lessons/ai-agents" target="_blank" class="flex items-center gap-2 text-sm text-purple-600 hover:text-purple-800 transition">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                урокцифры.рф/lessons/ai-agents
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category 3: High School -->
+            <div class="max-w-5xl mx-auto animate-fade-in">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center text-white">🎓</div>
+                    <div>
+                        <h4 class="text-2xl font-bold text-green-700">Категория 3. Старшая школа (8–11 классы)</h4>
+                        <p class="text-gray-600 text-sm">Глубокое осмысление этических, социальных и профессиональных аспектов искусственного интеллекта; формирование ответственного отношения к использованию ИИ.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="p-6">
+                            <div class="flex items-start gap-3 mb-3">
+                                <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">2026</span>
+                            </div>
+                            <h5 class="font-bold text-lg text-gray-800 mb-2">Урок «Вайб-кодинг и профессии будущего»</h5>
+                            <p class="text-sm text-gray-600 mb-4">Занятие формирует представление о новом подходе к разработке с ИИ и знакомит с актуальными ИТ-профессиями через практику — создание веб-прототипа с помощью нейросети.</p>
+                            <div class="space-y-2">
+                                <a href="https://htweek.ru/lessons/2026/" target="_blank" class="flex items-center gap-2 text-sm text-green-600 hover:text-green-800 transition">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    htweek.ru/lessons/2026/
+                                </a>
+                                <a href="https://disk.yandex.ru/d/WW7prlEuuoa62Q" target="_blank" class="flex items-center gap-2 text-sm text-green-600 hover:text-green-800 transition">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                                    Раздаточные материалы (Яндекс.Диск)
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+                        <div class="p-6">
+                            <div class="flex items-start gap-3 mb-3">
+                                <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">2025</span>
+                            </div>
+                            <h5 class="font-bold text-lg text-gray-800 mb-2">Онлайн-курс «ИИ простыми словами»</h5>
+                            <p class="text-sm text-gray-600 mb-4">Курс из 7 видеоуроков с практическими заданиями: что такое генеративные нейросети, как создавать точные промпты, как анализировать данные с помощью ИИ и как этот навык поможет в построении карьеры.</p>
+                            <div class="space-y-2">
+                                <a href="https://ai-academy.ru/training/courses/ii-prostymi-slovami/promo/" target="_blank" class="flex items-center gap-2 text-sm text-green-600 hover:text-green-800 transition">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    ai-academy.ru
+                                </a>
+                                <a href="https://stepik.org/course/255583/promo" target="_blank" class="flex items-center gap-2 text-sm text-green-600 hover:text-green-800 transition">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    stepik.org
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODULE 3 -->
+    <section id="module3" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12 animate-fade-in">
+                <div class="inline-block bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm font-semibold mb-4">Модуль 3 — 2 академических часа</div>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Итоговое тестирование</h2>
+                <div class="section-divider mx-auto w-20 mb-6"></div>
+            </div>
+
+            <div class="max-w-4xl mx-auto mb-10 animate-fade-in">
+                <div class="bg-gray-50 rounded-2xl p-6 shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div class="text-2xl font-bold text-indigo-600">20</div>
+                            <div class="text-sm text-gray-600">минут</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-indigo-600">75%</div>
+                            <div class="text-sm text-gray-600">порог прохождения (9/12)</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-indigo-600">2</div>
+                            <div class="text-sm text-gray-600">попытки</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questions -->
+            <div class="max-w-4xl mx-auto animate-fade-in" id="testQuestions">
+                <!-- Q1 -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6 question-card" data-q="1">
+                    <h4 class="font-bold text-lg mb-4 text-gray-800"><span class="text-indigo-600">Вопрос 1.</span> Что является основным принципом работы современных нейросетей?</h4>
+                    <div class="space-y-2">
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="1" data-a="a">а) Программирование жёстких правил для каждой задачи</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="1" data-a="b" data-correct="true">б) Обучение на больших массивах данных и выявление закономерностей</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="1" data-a="c">в) Точное копирование работы человеческого мозга</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="1" data-a="d">г) Подключение к единой мировой базе знаний</div>
+                    </div>
+                    <div class="explanation hidden mt-4 info-card p-4 rounded-lg text-sm text-gray-700">
+                        <strong>Пояснение:</strong> Нейросети обучаются, анализируя большие массивы данных и выявляя статистические закономерности. Они не программируются по жёстким правилам и не копируют работу мозга в точности — их архитектура лишь вдохновлена биологическими принципами.
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6 question-card" data-q="2">
+                    <h4 class="font-bold text-lg mb-4 text-gray-800"><span class="text-indigo-600">Вопрос 2.</span> Что такое «галлюцинация» нейросети?</h4>
+                    <div class="space-y-2">
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="2" data-a="a">а) Сбой в работе программы, приводящий к её отключению</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="2" data-a="b" data-correct="true">б) Генерация уверенно звучащей, но фактически недостоверной информации</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="2" data-a="c">в) Способность нейросети создавать визуальные образы</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="2" data-a="d">г) Ошибка пользователя при формулировании запроса</div>
+                    </div>
+                    <div class="explanation hidden mt-4 info-card p-4 rounded-lg text-sm text-gray-700">
+                        <strong>Пояснение:</strong> «Галлюцинация» — это явление, при котором нейросеть генерирует правдоподобный, но фактически неверный контент: вымышленные факты, несуществующие цитаты, ложные даты.
+                    </div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6 question-card" data-q="3">
+                    <h4 class="font-bold text-lg mb-4 text-gray-800"><span class="text-indigo-600">Вопрос 3.</span> Какой из перечисленных принципов НЕ относится к правилам составления эффективного промпта?</h4>
+                    <div class="space-y-2">
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="3" data-a="a">а) Указание роли, в которой должна действовать нейросеть</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="3" data-a="b">б) Описание контекста и условий задачи</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="3" data-a="c" data-correct="true">в) Использование максимально коротких запросов из 2–3 слов</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="3" data-a="d">г) Указание желаемого формата результата</div>
+                    </div>
+                    <div class="explanation hidden mt-4 info-card p-4 rounded-lg text-sm text-gray-700">
+                        <strong>Пояснение:</strong> Эффективный промпт, как правило, требует достаточной детализации: указания роли, контекста, задачи, формата и ограничений. Слишком короткие запросы обычно приводят к общим и менее полезным ответам.
+                    </div>
+                </div>
+
+                <!-- Q4 -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6 question-card" data-q="4">
+                    <h4 class="font-bold text-lg mb-4 text-gray-800"><span class="text-indigo-600">Вопрос 4.</span> Какую информацию категорически нельзя вводить в нейросеть при подготовке учебных материалов?</h4>
+                    <div class="space-y-2">
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="4" data-a="a">а) Тему и план урока</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="4" data-a="b" data-correct="true">б) Персональные данные учеников (имена, оценки, характеристики)</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="4" data-a="c">в) Текст учебника для адаптации</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="4" data-a="d">г) Требования ФГОС к результатам обучения</div>
+                    </div>
+                    <div class="explanation hidden mt-4 info-card p-4 rounded-lg text-sm text-gray-700">
+                        <strong>Пояснение:</strong> Персональные данные учеников не должны передаваться в нейросети, так как эти сервисы являются внешними платформами. Данные могут быть использованы для дальнейшего обучения модели или храниться без надлежащей защиты, что нарушает требования Федерального закона № 152-ФЗ.
+                    </div>
+                </div>
+
+                <!-- Q5 -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6 question-card" data-q="5">
+                    <h4 class="font-bold text-lg mb-4 text-gray-800"><span class="text-indigo-600">Вопрос 5.</span> Ученик 9 класса сдал эссе, которое написано значительно лучше его предыдущих работ. Какое действие педагога является наиболее профессиональным?</h4>
+                    <div class="space-y-2">
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="5" data-a="a">а) Сразу поставить неудовлетворительную оценку за предполагаемое использование ИИ</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="5" data-a="b" data-correct="true">б) Провести проверочную беседу: попросить ученика объяснить ключевые тезисы, ответить на уточняющие вопросы</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="5" data-a="c">в) Проверить текст специальной программой для обнаружения ИИ-контента</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="5" data-a="d">г) Проигнорировать подозрения и поставить оценку за качество текста</div>
+                    </div>
+                    <div class="explanation hidden mt-4 info-card p-4 rounded-lg text-sm text-gray-700">
+                        <strong>Пояснение:</strong> Проверочная беседа — наиболее надёжный и корректный способ оценить, насколько ученик владеет материалом своей работы. Программы обнаружения ИИ-контента ненадёжны и дают много ложных срабатываний.
+                    </div>
+                </div>
+
+                <!-- Q6 -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6 question-card" data-q="6">
+                    <h4 class="font-bold text-lg mb-4 text-gray-800"><span class="text-indigo-600">Вопрос 6.</span> Какой тип задания является наиболее «ИИ-устойчивым»?</h4>
+                    <div class="space-y-2">
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="6" data-a="a">а) Написание реферата по теме из учебника</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="6" data-a="b">б) Решение типовых тестовых заданий с выбором ответа</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="6" data-a="c" data-correct="true">в) Рефлексивное задание, связанное с личным опытом ученика на уроке</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="6" data-a="d">г) Перевод текста с иностранного языка</div>
+                    </div>
+                    <div class="explanation hidden mt-4 info-card p-4 rounded-lg text-sm text-gray-700">
+                        <strong>Пояснение:</strong> Задания, привязанные к личному опыту ученика, к событиям конкретного урока, к локальному контексту, наиболее сложны для делегирования нейросети, поскольку ИИ не имеет доступа к этой информации.
+                    </div>
+                </div>
+
+                <!-- Q7 -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6 question-card" data-q="7">
+                    <h4 class="font-bold text-lg mb-4 text-gray-800"><span class="text-indigo-600">Вопрос 7.</span> Что из перечисленного лучше всего описывает рекомендуемый подход к оцениванию работ в эпоху ИИ?</h4>
+                    <div class="space-y-2">
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="7" data-a="a">а) Полный отказ от письменных домашних заданий</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="7" data-a="b" data-correct="true">б) Смещение фокуса с оценки конечного продукта на оценку процесса работы и глубины понимания</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="7" data-a="c">в) Обязательное использование программ-антиплагиатов для всех работ</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="7" data-a="d">г) Проведение всех контрольных работ исключительно в устной форме</div>
+                    </div>
+                    <div class="explanation hidden mt-4 info-card p-4 rounded-lg text-sm text-gray-700">
+                        <strong>Пояснение:</strong> Наиболее продуктивный подход состоит в том, чтобы перестроить систему оценивания так, чтобы она учитывала процесс работы (черновики, рефлексию, ход рассуждений), а не только конечный результат.
+                    </div>
+                </div>
+
+                <!-- Q8 -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6 question-card" data-q="8">
+                    <h4 class="font-bold text-lg mb-4 text-gray-800"><span class="text-indigo-600">Вопрос 8.</span> «Протокол честности» — это:</h4>
+                    <div class="space-y-2">
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="8" data-a="a">а) Программное обеспечение для выявления использования ИИ в работах учеников</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="8" data-a="b" data-correct="true">б) Краткая декларация ученика о том, использовал ли он ИИ, каким образом и что сделал самостоятельно</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="8" data-a="c">в) Юридический документ, запрещающий использование нейросетей в школе</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="8" data-a="d">г) Система автоматической проверки работ на оригинальность</div>
+                    </div>
+                    <div class="explanation hidden mt-4 info-card p-4 rounded-lg text-sm text-gray-700">
+                        <strong>Пояснение:</strong> «Протокол честности» — это педагогический инструмент формирования культуры академической добросовестности. Ученик прикладывает к работе декларацию: использовал ли он ИИ, для каких целей, что сделал самостоятельно и как проверил информацию.
+                    </div>
+                </div>
+
+                <!-- Q9 -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6 question-card" data-q="9">
+                    <h4 class="font-bold text-lg mb-4 text-gray-800"><span class="text-indigo-600">Вопрос 9.</span> Какое из утверждений о нейросетях является верным?</h4>
+                    <div class="space-y-2">
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="9" data-a="a">а) Современные нейросети понимают текст так же, как человек</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="9" data-a="b">б) Нейросеть всегда даёт фактически точные ответы, если задать правильный вопрос</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="9" data-a="c" data-correct="true">в) Нейросеть генерирует текст, предсказывая наиболее вероятное продолжение на основе обученных паттернов</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="9" data-a="d">г) Нейросеть имеет собственное мнение и ценности</div>
+                    </div>
+                    <div class="explanation hidden mt-4 info-card p-4 rounded-lg text-sm text-gray-700">
+                        <strong>Пояснение:</strong> Большие языковые модели работают по принципу предсказания следующего токена. Они не понимают текст в человеческом смысле, не имеют собственных ценностей и мнений и не гарантируют фактическую точность.
+                    </div>
+                </div>
+
+                <!-- Q10 -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6 question-card" data-q="10">
+                    <h4 class="font-bold text-lg mb-4 text-gray-800"><span class="text-indigo-600">Вопрос 10.</span> Что из перечисленного является наиболее продуктивной стратегией школы в отношении использования ИИ учениками?</h4>
+                    <div class="space-y-2">
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="10" data-a="a">а) Полный запрет на использование нейросетей во всех учебных ситуациях</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="10" data-a="b">б) Отсутствие какой-либо политики — каждый учитель решает сам</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="10" data-a="c" data-correct="true">в) Разработка прозрачной политики, которая определяет, когда ИИ допустим, когда нет, и как об использовании ИИ нужно сообщать</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="10" data-a="d">г) Разрешение неограниченного использования ИИ без каких-либо условий</div>
+                    </div>
+                    <div class="explanation hidden mt-4 info-card p-4 rounded-lg text-sm text-gray-700">
+                        <strong>Пояснение:</strong> Оптимальный подход — прозрачная, продуманная политика, которая дифференцирует ситуации, устанавливает правила декларирования и регулярно обновляется с учётом развития технологий.
+                    </div>
+                </div>
+
+                <!-- Q11 -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6 question-card" data-q="11">
+                    <h4 class="font-bold text-lg mb-4 text-gray-800"><span class="text-indigo-600">Вопрос 11.</span> Педагог хочет создать адаптированный текст для ученика с особыми образовательными потребностями. Как правильно сформулировать запрос?</h4>
+                    <div class="space-y-2">
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="11" data-a="a">а) «Напиши текст для Петрова Миши, ученика 4 "Б" класса, у которого по заключению ПМПК задержка психического развития»</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="11" data-a="b" data-correct="true">б) «Перепиши текст о круговороте воды простыми короткими предложениями, не более 8 слов в каждом, добавь к ключевым понятиям простые пояснения-ассоциации, объём не более 100 слов»</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="11" data-a="c">в) «Сделай текст попроще»</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="11" data-a="d">г) «Напиши текст для отстающего ученика»</div>
+                    </div>
+                    <div class="explanation hidden mt-4 info-card p-4 rounded-lg text-sm text-gray-700">
+                        <strong>Пояснение:</strong> Правильный подход предполагает детальное описание требований к тексту без указания персональных данных ученика и его диагноза. Вариант (а) нарушает закон о персональных данных, варианты (в) и (г) слишком неконкретны.
+                    </div>
+                </div>
+
+                <!-- Q12 -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6 question-card" data-q="12">
+                    <h4 class="font-bold text-lg mb-4 text-gray-800"><span class="text-indigo-600">Вопрос 12.</span> Какие нейросети из перечисленных являются российскими разработками?</h4>
+                    <div class="space-y-2">
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="12" data-a="a">а) ChatGPT и Midjourney</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="12" data-a="b" data-correct="true">б) GigaChat и YandexGPT</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="12" data-a="c">в) Claude и Gemini</div>
+                        <div class="test-option border-2 border-gray-200 rounded-lg p-3" data-q="12" data-a="d">г) DALL-E и Stable Diffusion</div>
+                    </div>
+                    <div class="explanation hidden mt-4 info-card p-4 rounded-lg text-sm text-gray-700">
+                        <strong>Пояснение:</strong> GigaChat разработан компанией «Сбер», YandexGPT — компанией «Яндекс». Это российские языковые модели, которые доступны бесплатно, хорошо работают с русским языком и не требуют дополнительных технических средств для доступа.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Score -->
+            <div class="max-w-4xl mx-auto animate-fade-in">
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div>
+                            <h4 class="text-2xl font-bold mb-2">Ваш результат</h4>
+                            <div class="progress-bar bg-white/30 rounded-full h-4 w-full max-w-md">
+                                <div id="progressFill" class="progress-fill bg-white rounded-full h-4 transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <p class="mt-3 text-lg"><span id="scoreText">0/12</span> — <span id="percentageText">0%</span></p>
+                            <p id="resultMessage" class="mt-2 text-sm opacity-90">Ответьте на вопросы, чтобы увидеть результат</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button id="checkAnswers" class="bg-white text-indigo-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-100 transition">
+                                Проверить ответы
+                            </button>
+                            <button id="resetTest" class="bg-white/20 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/30 transition">
+                                Сбросить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONCLUSION -->
+    <section id="conclusion" class="py-20 gradient-section">
+        <div class="container mx-auto px-4">
+            <div class="max-w-5xl mx-auto animate-fade-in">
+                <div class="text-center mb-10">
+                    <div class="inline-block bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm font-semibold mb-4">🎉 Завершение курса</div>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Поздравляем с завершением курса!</h2>
+                    <div class="section-divider mx-auto w-20"></div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg p-8 mb-10">
+                    <h4 class="text-xl font-bold text-gray-800 mb-4">Уважаемые коллеги!</h4>
+                    <p class="text-gray-700 leading-relaxed mb-6">Вы успешно прошли курс повышения квалификации <strong>«Цифровая педагогика: нейросети в образовательном процессе»</strong>.</p>
+
+                    <h5 class="text-lg font-bold text-indigo-700 mb-4">Что вы освоили:</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
+                        <div class="flex items-start gap-2 text-sm text-gray-600"><span class="text-green-500 mt-0.5">✓</span><span>Основные принципы работы нейросетей и генеративного ИИ</span></div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600"><span class="text-green-500 mt-0.5">✓</span><span>Возможности российских нейросетей (GigaChat, YandexGPT)</span></div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600"><span class="text-green-500 mt-0.5">✓</span><span>Приёмы эффективного использования нейросетей</span></div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600"><span class="text-green-500 mt-0.5">✓</span><span>Принципы промпт-инжиниринга</span></div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600"><span class="text-green-500 mt-0.5">✓</span><span>Стратегии оценивания работ учеников в условиях доступности ИИ</span></div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600"><span class="text-green-500 mt-0.5">✓</span><span>Методы проектирования «ИИ-устойчивых» заданий</span></div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600"><span class="text-green-500 mt-0.5">✓</span><span>Подходы к использованию нейросетей для инклюзивного образования</span></div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600"><span class="text-green-500 mt-0.5">✓</span><span>Правовые и этические аспекты применения ИИ в школе</span></div>
+                        <div class="flex items-start gap-2 text-sm text-gray-600"><span class="text-green-500 mt-0.5">✓</span><span>Готовые сценарии уроков по теме ИИ для разных возрастных групп</span></div>
+                    </div>
+
+                    <h5 class="text-lg font-bold text-indigo-700 mb-4">Что делать дальше:</h5>
+                    <div class="space-y-3 mb-8">
+                        <div class="flex items-start gap-3">
+                            <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">1</span>
+                            <p class="text-sm text-gray-600">Выберите один-два урока из методических материалов фонда «Вклад в будущее» и проведите их в своих классах.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">2</span>
+                            <p class="text-sm text-gray-600">Попробуйте использовать GigaChat или YandexGPT для подготовки к одному из ближайших занятий. Начните с простого: генерация заданий или адаптация текста.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">3</span>
+                            <p class="text-sm text-gray-600">Инициируйте открытый разговор с учениками о нейросетях: обсудите возможности, ограничения и правила использования.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">4</span>
+                            <p class="text-sm text-gray-600">Обсудите с коллегами возможность создания школьной политики по использованию ИИ.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">5</span>
+                            <p class="text-sm text-gray-600">Поделитесь полученным опытом с коллегами в вашей образовательной организации.</p>
+                        </div>
+                    </div>
+
+                    <div class="gradient-purple rounded-xl p-6 text-white text-center">
+                        <p class="text-lg font-semibold mb-3">Помните:</p>
+                        <p class="opacity-95 leading-relaxed">Технологии меняются стремительно, но неизменным остаётся главное — ваша роль наставника, который помогает ученикам расти, думать и находить свой путь.</p>
+                        <p class="mt-4 text-lg font-bold">Спасибо за ваш труд и стремление к развитию!</p>
+                    </div>
+
+                    <div class="mt-8 info-card p-5 rounded-xl">
+                        <p class="text-sm text-gray-700">По результатам успешного прохождения итогового тестирования вам будет направлен <strong>документ о повышении квалификации установленного образца</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <div class="flex items-center justify-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <span class="text-lg font-bold">ППК: Цифровая педагогика</span>
+                </div>
+                <p class="text-gray-400 text-sm mb-4">Курс повышения квалификации для педагогов по использованию нейросетей в образовательном процессе</p>
+                <p class="text-gray-500 text-sm">&copy; 2026 Институт педагогики. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Intersection Observer for animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
+        document.querySelectorAll('.animate-fade-in').forEach(el => observer.observe(el));
+
+        // Scroll to top button
+        const scrollTopBtn = document.getElementById('scrollTop');
+        window.addEventListener('scroll', () => {
+            scrollTopBtn.classList.toggle('visible', window.scrollY > 500);
+        });
+        scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Mobile menu
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
+            });
+        });
+
+        // Test functionality
+        const selectedAnswers = {};
+        
+        document.querySelectorAll('.test-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const questionCard = this.closest('.question-card');
+                if (questionCard.classList.contains('answered')) return;
+                
+                const qNum = this.getAttribute('data-q');
+                const aLetter = this.getAttribute('data-a');
+                
+                // Mark as selected
+                questionCard.querySelectorAll('.test-option').forEach(opt => {
+                    opt.classList.remove('border-indigo-500', 'bg-indigo-50');
+                });
+                this.classList.add('border-indigo-500', 'bg-indigo-50');
+                
+                selectedAnswers[qNum] = aLetter;
+            });
+        });
+
+        // Check answers
+        document.getElementById('checkAnswers').addEventListener('click', function() {
+            let correct = 0;
+            let total = 12;
+            
+            document.querySelectorAll('.question-card').forEach(card => {
+                card.classList.add('answered');
+                const qNum = card.getAttribute('data-q');
+                
+                card.querySelectorAll('.test-option').forEach(opt => {
+                    opt.classList.add('disabled');
+                    const isCorrect = opt.getAttribute('data-correct') === 'true';
+                    
+                    if (isCorrect) {
+                        opt.classList.add('correct');
+                        opt.classList.remove('border-gray-200', 'border-indigo-500', 'bg-indigo-50');
+                    } else if (selectedAnswers[qNum] === opt.getAttribute('data-a')) {
+                        opt.classList.add('incorrect');
+                        opt.classList.remove('border-gray-200', 'border-indigo-500', 'bg-indigo-50');
+                    } else {
+                        opt.classList.remove('border-gray-200', 'border-indigo-500', 'bg-indigo-50');
+                    }
+                    
+                    if (isCorrect) correct++;
+                });
+                
+                // Show explanation
+                card.querySelector('.explanation').classList.remove('hidden');
+            });
+            
+            // Update score
+            const pct = Math.round((correct / total) * 100);
+            document.getElementById('scoreText').textContent = `${correct}/${total}`;
+            document.getElementById('percentageText').textContent = `${pct}%`;
+            document.getElementById('progressFill').style.width = `${pct}%`;
+            
+            const msg = document.getElementById('resultMessage');
+            if (pct >= 75) {
+                msg.textContent = '✅ Поздравляем! Вы успешно прошли тестирование (порог: 75%)';
+                msg.className = 'mt-2 text-sm text-green-300 font-semibold';
+            } else {
+                msg.textContent = '❌ Не пройдено. Необходимо набрать не менее 75% (9 из 12 правильных ответов)';
+                msg.className = 'mt-2 text-sm text-yellow-200 font-semibold';
+            }
+        });
+
+        // Reset test
+        document.getElementById('resetTest').addEventListener('click', function() {
+            Object.keys(selectedAnswers).forEach(key => delete selectedAnswers[key]);
+            
+            document.querySelectorAll('.question-card').forEach(card => {
+                card.classList.remove('answered');
+                card.querySelectorAll('.test-option').forEach(opt => {
+                    opt.classList.remove('correct', 'incorrect', 'disabled', 'border-indigo-500', 'bg-indigo-50', 'border-gray-200');
+                    opt.classList.add('border-2', 'border-gray-200');
+                });
+                card.querySelector('.explanation').classList.add('hidden');
+            });
+            
+            document.getElementById('scoreText').textContent = '0/12';
+            document.getElementById('percentageText').textContent = '0%';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('resultMessage').textContent = 'Ответьте на вопросы, чтобы увидеть результат';
+            document.getElementById('resultMessage').className = 'mt-2 text-sm opacity-90';
+        });
+    </script>
+</body>
+</html>
+```
